@@ -4,7 +4,7 @@ import re
 from typing import List
 import logging
 
-
+PII_FIELDS = ('password', 'ssn', 'name', 'email', 'phone')
 class RedactingFormatter(logging.Formatter):
     """ Redacting Formatter class
         """
@@ -29,3 +29,13 @@ def filter_datum(fields: List[str], redaction: str, message: str, separator: str
     '''Function to filter out sensitive fields'''
     pattern = fr'({"|".join(fields)})=[^{separator}]+'
     return re.sub(pattern, fr'\1={redaction}', message)
+
+def get_logger() -> logging.Logger:
+    logger = logging.getLogger("user_data")
+    logger.setLevel(logging.INFO)
+    logger.propagate = False
+    handler = logging.StreamHandler()
+    style = RedactingFormatter(PII_FIELDS)
+    handler.setFormatter(style)
+    logger.addHandler(handler)
+    return logger
