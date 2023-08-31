@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 '''Module for filtered_logger'''
+import os
+import mysql.connector as connector
+from mysql.connector import Error
 import re
 from typing import List
 import logging
@@ -43,3 +46,17 @@ def get_logger() -> logging.Logger:
     handler.setFormatter(style)
     logger.addHandler(handler)
     return logger
+
+
+def get_db() -> connector.connection.MySQLConnection:
+    '''Function to connect to database'''
+    host = os.getenv("PERSONAL_DATA_DB_HOST", "localhost")
+    password = os.getenv("PERSONAL_DATA_DB_PASSWORD", "")
+    user = os.getenv("PERSONAL_DATA_DB_USERNAME", "root")
+    hol_db = os.getenv("PERSONAL_DATA_DB_NAME")
+
+    try:
+        connection = connector.connect(host=host, database=hol_db, username=user, password=password)  # nopep8
+        return connection
+    except Error as e:
+        print('Error:', e)
