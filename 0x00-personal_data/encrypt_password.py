@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 '''Module for encrypting password'''
 import bcrypt
 from typing import ByteString
