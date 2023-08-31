@@ -69,7 +69,7 @@ def main():
     cursor = connection.cursor(dictionary=True)
     cursor.execute("SELECT * FROM users")
     for row in cursor.fetchall():
-        message = ';'.join([f'{k}={v}' for k, v in row.items()])
+        message = '; '.join([f'{k}={v}' for k, v in row.items()])
         log.info(message)
     cursor.close()
     connection.close()
