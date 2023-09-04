@@ -17,8 +17,7 @@ class BasicAuth(Auth):
             return None
         if not authorization_header.startswith('Basic '):
             return None
-        else:
-            return authorization_header[6:]
+        return authorization_header.split()[1]
 
     def decode_base64_authorization_header(self, base64_authorization_header: str) -> str:  # nopep8
         '''Returns decoded value of base64 string'''
@@ -38,7 +37,7 @@ class BasicAuth(Auth):
             return None, None
         if ':' not in decoded_base64_authorization_header:
             return None, None
-        email, password = decoded_base64_authorization_header.split(':')
+        email, password = decoded_base64_authorization_header.split(':', 1)
         return email, password
 
     def user_object_from_credentials(self, user_email: str, user_pwd: str) -> TypeVar('User'):  # nopep8
@@ -59,10 +58,8 @@ class BasicAuth(Auth):
 
     def current_user(self, request=None) -> TypeVar('User'):
         '''Retrieves the User instance for a request'''
-        header = authorization_header(self, request)
-        b64_header = extract_base64_authorization_header(authorization_header)
-        decoded_header = decode_base64_authorization_header(
-            base64_authorization_header)
-        user_details = extract_user_credentials(
-            decode_base64_authorization_header)
-        return user_object_from_credentials(user_email, user_pwd)
+        header = Auth().authorization_header(request)
+        b64_header = self.extract_base64_authorization_header(header)
+        decoded_header = self.decode_base64_authorization_header(b64_header)
+        email, password = self.extract_user_credentials(decoded_header)
+        return self.user_object_from_credentials(email, password)
