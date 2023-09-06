@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 '''Module for Authentication'''
-import fnmatch
 from flask import request
-from typing import List, TypeVar
 from api.v1.auth.auth import Auth
 from uuid import uuid4
+from models.user import User
 
 
 class SessionAuth(Auth):
@@ -25,3 +24,21 @@ class SessionAuth(Auth):
             return None
         user_id = self.user_id_by_session_id.get(session_id)
         return user_id
+
+    def current_user(self, request=None):
+        '''Returns a User instance based on a cookie value'''
+        session_cookie = self.session_cookie(request)
+        if session_cookie:
+            user_id = self.user_id_for_session_id(session_cookie)
+        user = User.get(user_id)
+        return user
+
+    def destroy_session(self, request=None):
+        '''Destroys session'''
+        if request is None or not self.session_cookie(request):
+            return False
+        session = self.session_cookie(request)
+        if not self.user_id_for_session_id(session):
+            return False
+        del self.user_id_by_session_id[session]
+        return True
