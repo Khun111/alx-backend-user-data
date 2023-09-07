@@ -30,8 +30,9 @@ def session_login() -> str:
     cookie = getenv('SESSION_NAME')
     response.set_cookie('_my_session_id', session_id)
     return response
-    
-@app_views.route('/auth_session/logout', methods=['DELETE'], strict_slashes=False)
+
+
+@app_views.route('/auth_session/logout', methods=['DELETE'], strict_slashes=False)  # nopep8
 def session_logout() -> str:
     '''Destroy session'''
     from api.v1.app import auth
