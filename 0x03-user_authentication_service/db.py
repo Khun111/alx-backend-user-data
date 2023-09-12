@@ -53,3 +53,4 @@ class DB:
             if key not in self.valid_args:
                 raise ValueError
             user.key = value
+        self._session.commit()
