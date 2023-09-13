@@ -10,10 +10,12 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from user import Base, User
 
+
 class DB:
     """DB class
     """
-    valid_args = ["id", "email", "hashed_password", "session_id", "reset_token"]
+    valid_args = ["id", "email", "hashed_password",
+                  "session_id", "reset_token"]
 
     def __init__(self) -> None:
         """Initialize a new DB instance
@@ -31,12 +33,14 @@ class DB:
             DBSession = sessionmaker(bind=self._engine)
             self.__session = DBSession()
         return self.__session
+
     def add_user(self, email: str, hashed_password: str) -> User:
         """Save user to database"""
         user = User(email=email, hashed_password=hashed_password)
         self._session.add(user)
         self._session.commit()
         return user
+
     def find_user_by(self, **kwargs: Dict) -> User:
         '''Match user with kwargs'''
         for arg in kwargs:
@@ -45,12 +49,14 @@ class DB:
         user = self._session.query(User).filter_by(**kwargs).first()
         if user is None:
             raise NoResultFound
-        return user    
-    def update_user(self, user_id: int, **kwargs : Dict) -> None:
+        return user
+
+    def update_user(self, user_id: int, **kwargs: Dict) -> None:
         '''Update user with user_id'''
         user = self.find_user_by(id=user_id)
         for key, value in kwargs.items():
-            if key not in self.valid_args:
+            if hasattr(user, key):
+                setattr(user, key, value)
+            else:
                 raise ValueError
-            user.key = value
         self._session.commit()

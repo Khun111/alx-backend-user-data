@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 '''Authentication Module'''
 from sqlalchemy.orm.exc import NoResultFound
-from bcrypt import hashpw, gensalt, checkpw
+from bcrypt import checkpw, hashpw, gensalt
 from user import User
 from uuid import uuid4
 from db import DB
+
+
 def _hash_password(password: str) -> bytes:
     '''Returns salted hash of the input password,'''
     password = password.encode('utf-8')
     hashed_password = hashpw(password, gensalt())
     return hashed_password
+
 
 def _generate_uuid() -> str:
     '''Return string uuid'''
@@ -32,18 +35,18 @@ class Auth:
             user = self._db.add_user(email, hashed_password)
             return user
         raise ValueError(f'User {email} already exists')
+
     def valid_login(self, email: str, password: str) -> bool:
         '''Locates email and checks password'''
-		try:
+        try:
             user = self._db.find_user_by(email=email)
             password = password.encode('utf-8')
-            pass_hash = user.hashed_password
             if (type(user.hashed_password) == str):
-                pass_hash = user.hashed_password.encode('utf-8')
-            checkpass = bcrypt.checkpw(password, pass_hash)
-            return checkpass
+                encode_hash = user.hashed_password.encode('utf-8')
+            return checkpw(password, encode_hash)
         except NoResultFound:
             return False
+
     def create_session(self, email: str) -> str:
         '''Creates session id'''
         try:
@@ -52,6 +55,7 @@ class Auth:
             return exist.session_id
         except NoResultFound:
             return None
+
     def get_user_from_session_id(self, session_id: str) -> User:
         '''Returns user from session_id'''
         if session_id is None:
@@ -61,8 +65,8 @@ class Auth:
             return user
         except NoResultFound:
             return None
+
     def destroy_session(self, user_id: int) -> None:
         '''Updates session_id to None'''
         self._db.update_user(user_id, session_id=None)
         return None
-
