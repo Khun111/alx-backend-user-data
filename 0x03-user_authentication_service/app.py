@@ -14,8 +14,8 @@ def index():
     return jsonify({"message": "Bienvenue"})
 
 
-@app.route('/users', methods=['POST'])
-def register_user():
+@app.route('/users', methods=['POST'], strict_slashes=False)
+def register_user() -> dict:
     '''Register user'''
     email = request.form.get('email')
     password = request.form.get('password')
@@ -26,8 +26,8 @@ def register_user():
         return jsonify({"message": "email already registered"}), 400
 
 
-@app.route('/sessions', methods=['POST'])
-def login():
+@app.route('/sessions', methods=['POST'], strict_slashes=False)
+def login() -> dict:
     '''Login user'''
     email = request.form.get('email')
     password = request.form.get('password')
@@ -41,7 +41,7 @@ def login():
         return response
 
 
-@app.route('/sessions', methods=['DELETE'])
+@app.route('/sessions', methods=['DELETE'], strict_slashes=False)
 def logout():
     session_id = request.cookies.get('session_id')
     user = AUTH.get_user_from_session_id(session_id)
@@ -52,8 +52,8 @@ def logout():
         abort(403)
 
 
-@app.route('/profile', methods=['GET'])
-def profile():
+@app.route('/profile', methods=['GET'], strict_slashes=False)
+def profile() -> dict:
     '''Find the user'''
     session_id = request.cookies.get('session_id')
     user = AUTH.get_user_from_session_id(session_id)
@@ -63,8 +63,8 @@ def profile():
         abort(403)
 
 
-@app.route('/reset_password', methods=['POST'])
-def get_reset_password_token():
+@app.route('/reset_password', methods=['POST'], strict_slashes=False)
+def get_reset_password_token() -> dict:
     '''Reset Password Route'''
     email = request.form.get('email')
     try:
@@ -74,8 +74,8 @@ def get_reset_password_token():
         abort(403)
 
 
-@app.route('/reset_password', methods=['PUT'])
-def update_password():
+@app.route('/reset_password', methods=['PUT'], strict_slashes=False)
+def update_password() -> dict:
     email = request.form.get('email')
     reset_token = request.form.get('reset_token')
     new_password = request.form.get('new_password')
